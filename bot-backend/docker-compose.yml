@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  bot-backend:
+    build: .
+    image: bot-backend:latest
+    container_name: bot-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DISABLE_BROWSER=false
+      - HEADLESS_BROWSER=true
+    ports:
+      - "3002:3002"
+    depends_on:
+      - order-tracker
+  order-tracker:
+    image: bot-backend:latest # reuse the same image
+    container_name: order-tracker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DISABLE_BROWSER=false
+      - HEADLESS_BROWSER=true
+    command: ["node", "dist/workers/OrderTracker.js"]

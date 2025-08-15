@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Page</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <h1>Debug Page</h1>
+    <div id="debug-info">
+        <h2>Environment Info:</h2>
+        <pre id="env-info"></pre>
+        <h2>Telegram WebApp Info:</h2>
+        <pre id="tg-info"></pre>
+    </div>
+    
+    <script>
+        // Display environment info
+        document.getElementById('env-info').textContent = JSON.stringify({
+            location: window.location.href,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        }, null, 2);
+        
+        // Display Telegram WebApp info
+        if (window.Telegram && window.Telegram.WebApp) {
+            document.getElementById('tg-info').textContent = JSON.stringify({
+                initData: window.Telegram.WebApp.initData,
+                initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
+                version: window.Telegram.WebApp.version,
+                platform: window.Telegram.WebApp.platform,
+                colorScheme: window.Telegram.WebApp.colorScheme,
+                themeParams: window.Telegram.WebApp.themeParams,
+                isExpanded: window.Telegram.WebApp.isExpanded,
+                viewportHeight: window.Telegram.WebApp.viewportHeight,
+                viewportStableHeight: window.Telegram.WebApp.viewportStableHeight
+            }, null, 2);
+        } else {
+            document.getElementById('tg-info').textContent = "Telegram WebApp not available";
+        }
+    </script>
+</body>
+</html>

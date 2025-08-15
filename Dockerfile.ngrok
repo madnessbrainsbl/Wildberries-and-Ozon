@@ -1,0 +1,5 @@
+FROM ngrok/ngrok:latest
+
+ENV NGROK_AUTHTOKEN=30j6XVoEHyly9oXAfXCLDynM3I5_7BKR4pQQ4HaMzWGonh5cE
+
+CMD ["ngrok", "http", "frontend:5173"]

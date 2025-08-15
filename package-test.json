@@ -1,0 +1,12 @@
+{
+  "name": "add-test-data",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "add-test-data": "node add-test-data.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1"
+  }
+}

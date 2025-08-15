@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
+    restart: always
+    networks:
+      - app-network
+
+  bot-backend:
+    build: ./bot-backend
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - TELEGRAM_BOT_TOKEN=8473502537:AAG1NAD5ryNZlx-FnEGGX9jlwqli7Zpq9Y0
+      - SUPABASE_URL=${VITE_SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      - MINIAPP_URL=https://ca62d8d14b3a93.lhr.life
+      - PORT=3002
+      - HEADLESS_BROWSER=true
+      - USE_POLLING=true
+    restart: always
+    networks:
+      - app-network
+    depends_on:
+      - frontend
+
+  tunnel:
+    build: ./tunnel
+    restart: always
+    networks:
+      - app-network
+    depends_on:
+      - frontend
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,91 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
+    restart: always
+    networks:
+      - app-network
+
+  bot-backend:
+    build: ./bot-backend
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - TELEGRAM_BOT_TOKEN=8473502537:AAG1NAD5ryNZlx-FnEGGX9jlwqli7Zpq9Y0
+      - SUPABASE_URL=${VITE_SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6cmFmZXhsYWxham9pcnp1Z2RqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MzcyOTQwMywiZXhwIjoyMDY5MzA1NDAzfQ.kv9CffI7XhHzXgpqA7zB1CqFwAYi4v3wvI1E_w3GqjQ
+      - JWT_SECRET=${JWT_SECRET}
+      - MINIAPP_URL=https://teleshop.su/miniapp/5358ebd1-d90b-4c55-a0ff-f8840f8da283
+      - PORT=3002
+      - HEADLESS_BROWSER=true
+      - DISABLE_BROWSER=false
+      - USE_MOCK_AUTH=true
+    restart: always
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    networks:
+      - app-network
+    depends_on:
+      - frontend
+
+  tunnel:
+    build: ./tunnel
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app-network
+    depends_on:
+      - frontend
+
+  add-test-data:
+    image: node:20
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "npm install --no-save @supabase/supabase-js dotenv && node add-test-data.js"
+    environment:
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+
+  # PostgreSQL for local development
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: marketplace
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+

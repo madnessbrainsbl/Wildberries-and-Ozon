@@ -1,0 +1,11 @@
+version: "2"
+authtoken: 30j6xgNtg90VW1a5HbDejvG4NHg_2p8nvgdEa8prRuvctXCWK
+tunnels:
+  frontend:
+    addr: frontend:5173
+    proto: http
+    host_header: "localhost:5173"
+  bot-backend:
+    addr: bot-backend:3002
+    proto: http
+    host_header: "localhost:3002"
